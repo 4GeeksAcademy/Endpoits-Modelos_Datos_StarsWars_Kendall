@@ -15,6 +15,14 @@ class User(db.Model):
     subscription_date: Mapped[Date] = mapped_column(Date())
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
+    def __init__(self, email, password, name, last_name, subscription_date, is_active):
+        self.email = email
+        self.password = password
+        self.name = name
+        self.last_name = last_name
+        self.subscription_date = subscription_date
+        self.is_active = is_active
+
 
     def serialize(self):
         return {
@@ -23,7 +31,7 @@ class User(db.Model):
             "name": self.name,
             "last_name": self.last_name,
             "subscription_date": self.subscription_date,
-            
+            "is_active": self.is_active,
             "favorites": [favorite.serialize() for favorite in self.favorites]
         }
 

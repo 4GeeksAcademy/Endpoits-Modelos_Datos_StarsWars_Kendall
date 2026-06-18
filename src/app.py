@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Person
+from models import db, User, Person, Planets
 #from models import Person
 
 app = Flask(__name__)
@@ -36,18 +36,72 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route("/people")
-def get_people():
+def getVal(request_body, fields):
+    for field in fields:
+        value = request_body.get(field)
+        if not value:
+            raise APIException(
+                f"Se debe proveer un valor para {field}", status_code=400)
+
+@app.route("/user", methods=["POST"])
+def create_user():
+
+    body = request.get_json()
+    email, password, name, last_name, subscription_date, is_active = getVal(
+        body, ["email", "password", "name", "last_name", "subscription_date", "is_active"])
+
+    user = User(email=email, password=password, name=name, last_name=last_name, subscription_date=subscription_date, is_active=is_active)
     
+    try:        
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"msg": "Creando un torneo", 
+                    "user": user.serialize()
+    }), 201
+
+@app.route("/person")
+def get_people():
     try:
         person = Person.query.all()
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-    
     return jsonify([item.serialize() for item in person]), 200
 
+@app.route("/people/<int:people_id>")
+def get_people_id(people_id):
+    try:
+        person = Person.query.get(people_id)
+        if not person:
+            return jsonify({"error": "Person not found"}), 404
+        return jsonify([item.serialize() for item in person]), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
+@app.route("/planets")
+def get_planets():
+    try:
+        planets = Planets.query.all()
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify([item.serialize() for item in planets]), 200
+
+@app.route("/planets/<int:planets_id>")
+def get_people_id(people_id):
+    try:
+        person = Person.query.get(people_id)
+        if not person:
+            return jsonify({"error": "Person not found"}), 404
+        return jsonify([item.serialize() for item in person]), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 
