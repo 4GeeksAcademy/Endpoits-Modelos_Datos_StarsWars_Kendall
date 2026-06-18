@@ -42,6 +42,15 @@ def getVal(request_body, fields):
         if not value:
             raise APIException(
                 f"Se debe proveer un valor para {field}", status_code=400)
+        
+@app.route("/user")
+def get_user():
+    try:
+        user = User.query.all()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    return jsonify([item.serialize() for item in user]), 200
 
 @app.route("/user", methods=["POST"])
 def create_user():
@@ -58,9 +67,10 @@ def create_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    return jsonify({"msg": "Creando un torneo", 
+    return jsonify({"msg": "Creando usuario 😻", 
                     "user": user.serialize()
     }), 201
+
 
 @app.route("/person")
 def get_people():
@@ -93,12 +103,12 @@ def get_planets():
     return jsonify([item.serialize() for item in planets]), 200
 
 @app.route("/planets/<int:planets_id>")
-def get_people_id(people_id):
+def get_planets_id(planets_id):
     try:
-        person = Person.query.get(people_id)
-        if not person:
-            return jsonify({"error": "Person not found"}), 404
-        return jsonify([item.serialize() for item in person]), 200
+        planets = Planets.query.get(planets_id)
+        if not planets:
+            return jsonify({"error": "Planets not found"}), 404
+        return jsonify([item.serialize() for item in planets]), 200
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
