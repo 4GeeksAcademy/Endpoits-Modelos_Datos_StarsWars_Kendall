@@ -30,7 +30,7 @@ class User(db.Model):
             "email": self.email,
             "name": self.name,
             "last_name": self.last_name,
-            "subscription_date": self.subscription_date,
+            "subscription_date": self.subscription_date.isoformat() if self.subscription_date else None,
             "is_active": self.is_active,
             "favorites": [favorite.serialize() for favorite in self.favorites]
         }
@@ -91,6 +91,6 @@ class Favorites(db.Model):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "person_id": self.person_id,
-            "planet_id": self.planet_id
+            "person_id": self.person_id.serialize() if self.person_id else None,
+            "planet_id": self.planet_id.serialize() if self.planet_id else None
         }
