@@ -5,6 +5,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 db = SQLAlchemy()
 
 class User(db.Model):
+    __tablename__ = 'user'
+
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
@@ -26,10 +28,16 @@ class User(db.Model):
         }
 
 class Person(db.Model):
+    __tablename__ = 'person'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
     species: Mapped[str] = mapped_column(String(30))
     hair_or_skin_color: Mapped[str] = mapped_column(String(30))
+
+    def __init__(self, name, species, hair_or_skin_color):
+        self.name = name
+        self.species = species
+        self.hair_or_skin_color = hair_or_skin_color
 
     def serialize(self):
         return {
@@ -40,10 +48,16 @@ class Person(db.Model):
         }
     
 class Planets(db.Model):
+    __tablename__ = 'planets'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
     weather: Mapped[str] = mapped_column(String(30))
     land: Mapped[str] = mapped_column(String(30))
+
+    def __init__(self, name, weather, land):
+        self.name = name
+        self.weather = weather
+        self.land = land
 
     def serialize(self):
         return {
@@ -54,6 +68,7 @@ class Planets(db.Model):
         }
     
 class Favorites(db.Model):
+    __tablename__ = 'favorites'
     id: Mapped[int] = mapped_column(primary_key=True)
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
