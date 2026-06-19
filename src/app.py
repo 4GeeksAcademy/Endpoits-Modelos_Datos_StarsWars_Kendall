@@ -53,6 +53,30 @@ def getVal(request_body, fields):
     return values
 
 
+@app.route("/user", methods=["POST"])
+def create_user():
+
+    body = request.get_json()
+    email, password, name, last_name = getVal(
+        body, ["email", "password", "name", "last_name", "is_active"])
+
+    user = User(email=email,
+                password=password,
+                name=name,
+                last_name=last_name)
+
+    try:
+        db.session.add(user)
+        db.session.commit()
+        db.session.refresh(user)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"msg": "Creando usuario 😻",
+                    "user": user.serialize()
+                    }), 201
+
+
 @app.route("/user")
 def get_user():
     try:
@@ -61,27 +85,6 @@ def get_user():
         return jsonify({"error": str(e)}), 500
 
     return jsonify([item.serialize() for item in user]), 200
-
-
-@app.route("/user", methods=["POST"])
-def create_user():
-
-    body = request.get_json()
-    email, password, name, last_name, subscription_date, is_active = getVal(
-        body, ["email", "password", "name", "last_name", "subscription_date", "is_active"])
-
-    user = User(email=email, password=password, name=name, last_name=last_name,
-                subscription_date=subscription_date, is_active=is_active)
-
-    try:
-        db.session.add(user)
-        db.session.commit()
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-    return jsonify({"msg": "Creando usuario 😻",
-                    "user": user.serialize()
-                    }), 201
 
 
 @app.route("/people")
