@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, ForeignKey, Date, func
+from sqlalchemy import String, Boolean, ForeignKey, Date, func, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import date
 
