@@ -8,7 +8,8 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Person, Planets, Favorites, select
+from models import db, User, Person, Planets, Favorites
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 # from models import Person
 
@@ -69,6 +70,9 @@ def get_users():
 def create_user():
 
     body = request.get_json()
+    if body is None:
+        return jsonify({"error": "El cuerpo de la petición debe ser un JSON válido"}), 400
+
     email, password, name, last_name = getVal(
         body, ["email", "password", "name", "last_name"])
 
@@ -81,8 +85,12 @@ def create_user():
         db.session.add(user)
         db.session.commit()
         db.session.refresh(user)
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"error": "El correo electrónico ya está registrado"}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        db.session.rollback()
+        return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
 
     return jsonify({"msg": "Creando usuario 😻",
                     "user": user.serialize()
