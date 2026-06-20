@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, ForeignKey, Date, func, select
+from sqlalchemy import String, Boolean, ForeignKey, Date, func, select, true
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import date
 
@@ -14,7 +14,7 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(String(16),nullable=False)
     last_name: Mapped[str] = mapped_column(String(16), nullable=False)
     subscription_date: Mapped[date] = mapped_column(Date(), server_default=func.current_date())
-    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False, server_default="1")
+    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False, server_default=true())
 
     def serialize(self):
         return {
