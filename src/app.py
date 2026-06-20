@@ -146,7 +146,7 @@ def get_planets_id(planets_id):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/favorites/planet/<int:planet_id>", methods=["POST"])
+@app.route("/favorite/planet/<int:planet_id>", methods=["POST"])
 def add_favorite_planet(planet_id):
     body = request.get_json()
     user_id = body.get("user_id") if body else None
@@ -219,7 +219,8 @@ def remove_favorite_planet(planet_id):
     if not user_id:
         return jsonify({"error": "Se debe proveer un valor para user_id"}), 400
     try:
-        favorite = db.session.query(Favorites).filter(Favorites.user_id == user_id, Favorites.planet_id == planet_id).first()
+        query = select(Favorites).where(Favorites.user_id == user_id, Favorites.planet_id == planet_id)
+        favorite = db.session.scalars(query).first()
         if not favorite:
             return jsonify({"error": f"El planeta con id {planet_id} no se encuentra en los favoritos del usuario con id {user_id}"}), 404
 
@@ -242,7 +243,8 @@ def remove_favorite_person(people_id):
     if not user_id:
         return jsonify({"error": "Se debe proveer un valor para user_id"}), 400
     try:
-        favorite = db.session.query(Favorites).filter(Favorites.user_id == user_id, Favorites.person_id == people_id).first()
+        query = select(Favorites).where(Favorites.user_id == user_id, Favorites.person_id == people_id)
+        favorite = db.session.scalars(query).first()
         if not favorite:
             return jsonify({"error": f"La persona con id {people_id} no se encuentra en los favoritos del usuario con id {user_id}"}), 404
 
