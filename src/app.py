@@ -70,7 +70,7 @@ def create_user():
 
     body = request.get_json()
     email, password, name, last_name = getVal(
-        body, ["email", "password", "name", "last_name", "is_active"])
+        body, ["email", "password", "name", "last_name"])
 
     user = User(email=email,
                 password=password,
